@@ -6,3 +6,8 @@ Debug
 Library
 obj
 package-lock.json
+
+*.csproj
+*.unityproj
+*.sln
+*.suo
