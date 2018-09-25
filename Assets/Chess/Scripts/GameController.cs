@@ -152,7 +152,6 @@ namespace ChessGame
 
         private void onChangeTurn(Event e)
         {
-            Debug.LogFormat("onChangeTurn");
             if (!model.IsMyTurn)
             {
                 model.SetSelectedPiece(null);

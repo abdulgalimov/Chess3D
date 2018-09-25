@@ -68,7 +68,9 @@ namespace ChessGame
         {
             if (_targets.ContainsKey(name))
             {
-                List<Target> list = _targets[name];
+                Target[] list = new Target[_targets[name].Count];
+                _targets[name].CopyTo(list);
+                //
                 foreach (Target target in list)
                 {
                     target.Activate(data);

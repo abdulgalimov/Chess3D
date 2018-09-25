@@ -64,8 +64,7 @@ namespace ChessGame
                 });
             //
             //
-            float rotate = Color == PieceColor.White ? 90 : -90;
-            float dir = (float)(Math.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z)*180/Math.PI)+rotate;
+            float dir = (float)(Math.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z)*180/Math.PI) + 90;
             return DOTween.Sequence()
                 .Append(transform.DORotate(new Vector3(0, dir, 0), 0.2f))
                 .Append(transform.DORotate(new Vector3(5, dir, -10), 0.3f).SetEase(Ease.OutExpo))
