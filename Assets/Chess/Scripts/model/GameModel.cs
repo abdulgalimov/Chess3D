@@ -7,6 +7,14 @@ using UnityEngine;
 
 namespace ChessGame
 {
+    public class MoveConf
+    {
+        public Position fromPosition;
+        public Position toPosition;
+        public PieceConf fromPiece;
+        public PieceConf toPiece;
+        public Vector3 toGamePosition;
+    }
     
     public class GameModel : EventEmitter
     {
@@ -166,18 +174,20 @@ namespace ChessGame
         
         public void MovePiece(Position from , Position to)
         {
-            PieceConf fromPiece = GetPieceByPosition(from);
-            if (fromPiece == null) return;
+            MoveConf moveConf = new MoveConf();
+            moveConf.fromPosition = from;
+            moveConf.toPosition = to;
+            moveConf.fromPiece = GetPieceByPosition(from);
+            if (moveConf.fromPiece == null) return;
             //
-            PieceConf toPiece = GetPieceByPosition(to);
-            if (toPiece != null)
+            moveConf.toPiece = GetPieceByPosition(to);
+            if (moveConf.toPiece != null)
             {
-                float timeout = fromPiece.piece.Type == PieceType.KNIGHT ? 0.75f : 0.1f;
-                toPiece.piece.Kill(timeout);
-                pieces.Remove(toPiece);
+                pieces.Remove(moveConf.toPiece);
             }
+            moveConf.toGamePosition = Coord.modelToGame(moveConf.toPosition);
             //
-            fromPiece.piece.MoveTo(to);
+            moveConf.fromPiece.piece.MoveTo(moveConf);
         }
 
         public void RemoveAll()

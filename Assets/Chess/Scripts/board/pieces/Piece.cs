@@ -99,10 +99,15 @@ namespace ChessGame
 			return false;
 		}
 
-		public virtual void MoveTo(Position to)
+		public virtual void MoveTo(MoveConf moveConf)
 		{
-			position.Update(to);
-			transform.DOMove(Coord.modelToGame(to), 0.5f);
+			position.Update(moveConf.toPosition);
+			transform.DOMove(moveConf.toGamePosition, 0.5f);
+			//
+			if (moveConf.toPiece != null)
+			{
+				moveConf.toPiece.piece.Kill();
+			}
 		}
 
 
@@ -130,11 +135,6 @@ namespace ChessGame
 		{
 			yield return new WaitForSeconds(seconds);
 			gameObject.GetComponent<Renderer>().enabled = false;
-		}
-
-		public void Reset()
-		{
-			MoveTo(originPosition);
 		}
 
 		public void Release()
