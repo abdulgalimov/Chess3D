@@ -28,10 +28,9 @@ namespace ChessGame
         {
             _connected = false;
 #if UNITY_EDITOR
-            //string url = "ws://127.0.0.1:1551";
-            string url = "ws://abdulgalimov.com/1551";
+            string url = "ws://127.0.0.1:1551";
 #else
-            string url = "ws://abdulgalimov.com/1551";
+            string url = "ws://abdulgalimov.com:1551";
 #endif
             ws = new WebSocket(new Uri(url));
             GameController.instance.StartCoroutine(ws.Connect());            

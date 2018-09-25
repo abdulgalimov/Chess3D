@@ -5,7 +5,7 @@
 
 console.log('client');
 
-const ws = new WebSocket('ws://localhost:1551');
+const ws = new WebSocket('ws://abdulgalimov.com:1551');
 ws.onopen = function() {
   console.log('on open');
 };

@@ -1,5 +1,4 @@
 {
-  "script": "main.js",
   "main": "main.js",
   "name": "chess3d",
   "ignore_watch": ["temp"],
