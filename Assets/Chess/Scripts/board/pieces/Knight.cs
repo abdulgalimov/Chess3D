@@ -1,4 +1,5 @@
 using System;
+using ChessGame.camera;
 using DG.Tweening;
 using UnityEngine;
 
@@ -22,11 +23,14 @@ namespace ChessGame
                 position.Update(moveConf.toPosition);
                 if (mainCamera != null && moveConf.toPiece != null)
                 {
-                    mainCamera.KnightMove(this, moveConf.toGamePosition)
-                        .onComplete += () =>
+                    CameraController camera = mainCamera.KnightAttack(this, moveConf.toGamePosition);
+                    camera.on(CameraControllerEvents.ON_COMPLETE, e =>
                     {
-                        playAnim(moveConf);
-                    };
+                        playAnim(moveConf).onComplete += () =>
+                        {
+                            camera.Exit();
+                        };                        
+                    });
                 }
                 else
                 {
@@ -35,7 +39,7 @@ namespace ChessGame
             }
         }
 
-        private void playAnim(MoveConf moveConf)
+        private Tween playAnim(MoveConf moveConf)
         {
             if (moveConf.toPiece != null)
             {
@@ -62,17 +66,10 @@ namespace ChessGame
             //
             float rotate = Color == PieceColor.White ? 90 : -90;
             float dir = (float)(Math.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z)*180/Math.PI)+rotate;
-            DOTween.Sequence()
+            return DOTween.Sequence()
                 .Append(transform.DORotate(new Vector3(0, dir, 0), 0.2f))
                 .Append(transform.DORotate(new Vector3(5, dir, -10), 0.3f).SetEase(Ease.OutExpo))
-                .Append(transform.DORotate(new Vector3(0, dir, 0), 0.3f).SetEase(Ease.OutExpo))
-                .onComplete += () =>
-            {
-                if (mainCamera != null)
-                {
-                    mainCamera.Reset();
-                }
-            };            
+                .Append(transform.DORotate(new Vector3(0, dir, 0), 0.3f).SetEase(Ease.OutExpo));
         }
     }
 }

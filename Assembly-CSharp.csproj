@@ -63,9 +63,13 @@
     <Compile Include="Assets\Chess\Scripts\board\pieces\PieceFactory.cs" />
     <Compile Include="Assets\Chess\Scripts\board\pieces\Queen.cs" />
     <Compile Include="Assets\Chess\Scripts\board\pieces\Rock.cs" />
+    <Compile Include="Assets\Chess\Scripts\camera\controllers\CameraController.cs" />
+    <Compile Include="Assets\Chess\Scripts\camera\controllers\CGameController.cs" />
+    <Compile Include="Assets\Chess\Scripts\camera\controllers\CKnightAttackController.cs" />
+    <Compile Include="Assets\Chess\Scripts\camera\controllers\CMainController.cs" />
+    <Compile Include="Assets\Chess\Scripts\camera\MainCamera.cs" />
     <Compile Include="Assets\Chess\Scripts\GameController.cs" />
     <Compile Include="Assets\Chess\Scripts\Hourglass\Hourglass.cs" />
-    <Compile Include="Assets\Chess\Scripts\MainCamera.cs" />
     <Compile Include="Assets\Chess\Scripts\MainController.cs" />
     <Compile Include="Assets\Chess\Scripts\model\GameModel.cs" />
     <Compile Include="Assets\Chess\Scripts\model\Player.cs" />
