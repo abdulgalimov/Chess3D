@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ChessGame.camera
@@ -9,9 +10,16 @@ namespace ChessGame.camera
             
         }
 
+        private double time;
+        public override void Start()
+        {
+            time = DateTime.Now.TimeOfDay.TotalMilliseconds;
+        }
         public override void Update()
         {
-            cameraParent.Rotate(new Vector3(0, 1, 0), 0.3f);
+            double delta = DateTime.Now.TimeOfDay.TotalMilliseconds - time;
+            time = DateTime.Now.TimeOfDay.TotalMilliseconds;
+            cameraParent.Rotate(new Vector3(0, 1, 0), (float)delta/100.0f);
         }
     }
 }
