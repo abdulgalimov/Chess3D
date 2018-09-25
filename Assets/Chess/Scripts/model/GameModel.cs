@@ -78,8 +78,11 @@ namespace ChessGame
             get { return _currentTurn;}
             set
             {
-                _currentTurn = value;
-                emit("changeTurn");
+                if (_currentTurn != value)
+                {
+                    _currentTurn = value;
+                    emit("changeTurn");
+                }
             }
         }
 
