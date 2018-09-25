@@ -39,7 +39,7 @@ namespace ChessGame
         {
             if (moveConf.toPiece != null)
             {
-                moveConf.toPiece.piece.Kill(0.4f);
+                moveConf.toPiece.piece.Kill(0.2f);
             }
             //
             Vector3 targetPos = moveConf.toGamePosition;

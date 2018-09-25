@@ -32,7 +32,7 @@ public sealed class MainCamera : MonoBehaviour
         }
     }
 
-    public Tweener KnightMove(Knight fromPiece, Vector3 toPoint)
+    public Tweener KnightMove(Piece fromPiece, Vector3 toPoint)
     {
         Vector3 direction = toPoint - fromPiece.transform.position;
         direction.Normalize();
