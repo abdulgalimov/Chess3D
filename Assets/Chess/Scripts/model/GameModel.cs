@@ -9,7 +9,6 @@ namespace ChessGame
 {
     public class MoveConf
     {
-        public Position fromPosition;
         public Position toPosition;
         public PieceConf fromPiece;
         public PieceConf toPiece;
@@ -63,7 +62,6 @@ namespace ChessGame
         private PieceColor _myColor;
         public PieceColor MyColor
         {
-            get { return _myColor; }
             set { _myColor = value; }
         }
 
@@ -75,7 +73,6 @@ namespace ChessGame
         private PieceColor _currentTurn = 0;
         public PieceColor CurrentTurn
         {
-            get { return _currentTurn;}
             set
             {
                 if (_currentTurn != value)
@@ -141,7 +138,7 @@ namespace ChessGame
 
         public bool GetValidMove(Position pos)
         {
-            if (!_selected) return false;
+            if (!_selected || _selected.position.Compare(pos)) return false;
             //
             PieceConf toConf = GetPieceByPosition(pos);
             //
@@ -178,7 +175,6 @@ namespace ChessGame
         public void MovePiece(Position from , Position to)
         {
             MoveConf moveConf = new MoveConf();
-            moveConf.fromPosition = from;
             moveConf.toPosition = to;
             moveConf.fromPiece = GetPieceByPosition(from);
             if (moveConf.fromPiece == null) return;

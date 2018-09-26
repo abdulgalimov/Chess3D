@@ -6,12 +6,19 @@ using Event = ChessGame.Event;
 
 public sealed class MainCamera : MonoBehaviour
 {
+    public static MainCamera instance;
     private CMainController main = new CMainController();
     private CGameController game = new CGameController();
     private CKnightAttackController knightAttack = new CKnightAttackController();
+    
+    [SerializeField]
+    private Camera camera;
+
     public void Start()
     {
-        CameraController.Init(gameObject);
+        instance = this;
+        //
+        CameraController.Init(camera);
         //
         knightAttack.on(CameraControllerEvents.ON_EXIT, onExit);
         //
@@ -42,6 +49,11 @@ public sealed class MainCamera : MonoBehaviour
         {
             current.Update();
         }
+    }
+
+    public Camera GetCamera()
+    {
+        return camera;
     }
 
     public CameraController KnightAttack(Piece fromPiece, Vector3 toPoint)

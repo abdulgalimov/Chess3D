@@ -4,28 +4,29 @@ namespace ChessGame
 {
     public class MainController : MonoBehaviour
     {
-        /**
-         * select in editor
-         */
-        public Canvas canvas;
+        public static MainController instance;
         
-        private NetController net;
+        [SerializeField]
         private GameController game;
+        [SerializeField]
         private UIController ui;
+        [SerializeField]
         private MainCamera camera;
+        [SerializeField]
+        private NetController net;
+        
+        void Awake()
+        {
+            instance = this;
+        }
 
         private void Start()
         {
-            net = GetComponent<NetController>();
             net.emitter.on(NetActions.Connected, onNetConnected);
             net.emitter.on(NetActions.Closed, onNetClosed);
             net.emitter.on(NetActions.Init, onNetInit);
             net.emitter.on(NetActions.Move, onNetMove);
             net.emitter.on(NetActions.Game, onNetGame);
-            //
-            game = GetComponent<GameController>();
-            ui = canvas.GetComponent<UIController>();
-            camera = GetComponent<MainCamera>();
             //
             ui.SetStatus("Connection in progress");
             camera.WaitMode = true;

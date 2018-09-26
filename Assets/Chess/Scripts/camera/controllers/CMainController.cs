@@ -5,11 +5,6 @@ namespace ChessGame.camera
 {
     public class CMainController : CameraController
     {
-        public CMainController()
-        {
-            
-        }
-
         private double time;
         public override void Start()
         {

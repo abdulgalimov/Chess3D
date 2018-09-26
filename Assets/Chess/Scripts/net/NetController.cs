@@ -33,18 +33,12 @@ namespace ChessGame
             string url = "ws://abdulgalimov.com:1551";
 #endif
             ws = new WebSocket(new Uri(url));
-            GameController.instance.StartCoroutine(ws.Connect());            
+            MainController.instance.StartCoroutine(ws.Connect());            
         }
 
         private bool _connected;
         void Update()
         {
-            string error = ws.error;
-            if (error != null)
-            {
-                //Debug.LogFormat("ws error: {0}", error);
-            }
-            //
             if (ws.IsClosed())
             {
                 emitter.emit(NetActions.Closed);

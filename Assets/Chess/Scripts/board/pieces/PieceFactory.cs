@@ -65,11 +65,6 @@ namespace ChessGame
                     break;
                 case PieceType.KNIGHT:
                     piece = pieceObj.AddComponent<Knight>();
-                    if (color == PieceColor.White)
-                    {
-                        Knight knight = (Knight) piece;
-                        knight.mainCamera = GameController.instance.GetMainCamera();
-                    }
                     break;
                 case PieceType.BISHOP:
                     piece = pieceObj.AddComponent<Bishop>();
@@ -83,7 +78,6 @@ namespace ChessGame
             }
             piece.Color = color;
             piece.Type = type;
-            piece.prefab = (GameObject)Resources.Load("FireAura/FirePrefab", typeof(GameObject));
             piece.Start();
             //
             PieceConf conf = new PieceConf();

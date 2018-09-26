@@ -4,42 +4,22 @@ namespace ChessGame
 {
     public class GameController : MonoBehaviour
     {
-        /**
-         * select in editor
-         */
-        public Board board;
-        public Hourglass hourglass;
-        
-        
-        public static GameController instance;
-        void Awake()
-        {
-            instance = this;
-        }
-        
-        
-        private Camera camera;
-        private MainCamera mainCamera;
-        private GameModel model;
+        [SerializeField]
+        private Board board;
+        [SerializeField]
+        private Hourglass hourglass;
+        [SerializeField]
         private NetController net;
-
+        
+        private GameModel model;
         private void Start()
         {
             model = new GameModel();
-            camera = GetComponent<Camera>();
-            mainCamera = camera.GetComponent<MainCamera>();
             //
             PieceFactory.Init(board.gameObject);
             //
             model.on("changeTurn", onChangeTurn);
             model.reinit();
-            //
-            net = GetComponent<NetController>();
-        }
-
-        public MainCamera GetMainCamera()
-        {
-            return mainCamera;
         }
 
         private bool _isSelected;
@@ -50,10 +30,9 @@ namespace ChessGame
                 if (_isSelected)
                 {
                     RaycastHit hit;
-                    GameObject selector;
-                    if (getHit(out hit, out selector))
+                    if (getHit(out hit))
                     {
-                        move(selector, hit);
+                        move(hit);
                     }
                 }
             }
@@ -61,10 +40,9 @@ namespace ChessGame
             if (Input.GetMouseButtonDown(0))
             {
                 RaycastHit hit;
-                GameObject selector;
-                if (getHit(out hit, out selector))
+                if (getHit(out hit))
                 {
-                    down(selector, hit);
+                    down(hit);
                 }
                 _isSelected = true;
             }
@@ -75,10 +53,9 @@ namespace ChessGame
                 if (model.IsMyTurn)
                 {
                     RaycastHit hit;
-                    GameObject selector;
-                    if (getHit(out hit, out selector))
+                    if (getHit(out hit))
                     {
-                        up(selector, hit);
+                        up(hit);
                     }
                     model.DisableMy(false);                
                 }
@@ -86,23 +63,20 @@ namespace ChessGame
         }
         
         // raycast begin ********************************************************************************
-        private bool getHit(out RaycastHit hit, out GameObject selector)
+        private bool getHit(out RaycastHit hit)
         {
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MainCamera.instance.GetCamera().ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit))
             {
-                Transform objectHit = hit.transform;
-                selector = objectHit.gameObject;
                 return true;
             }
 
-            selector = null;
             return false;
         }
-        private void down(GameObject target, RaycastHit hit)
+        private void down(RaycastHit hit)
         {
-            Piece piece = target.GetComponent<Piece>();
+            Piece piece = hit.transform.GetComponent<Piece>();
             if (piece)
             {
                 model.SetSelectedPiece(piece);
@@ -113,10 +87,10 @@ namespace ChessGame
             //
             model.DisableMy(true);
             board.AuraVisible(model.Selected != null);
-            move(target, hit);
+            move(hit);
         }
 
-        private void move(GameObject target, RaycastHit hit)
+        private void move(RaycastHit hit)
         {
             if (!_isSelected) return;
             //
@@ -126,7 +100,7 @@ namespace ChessGame
             board.AuraPosition(targetPosition);
         }
 
-        private void up(GameObject target, RaycastHit hit)
+        private void up(RaycastHit hit)
         {
             model.DisableMy(false);
             board.AuraVisible(false);
@@ -138,7 +112,6 @@ namespace ChessGame
                 net.SendMove(model.Selected.position, targetPosition);
                 //
                 model.MovePiece(model.Selected.position, targetPosition);
-                //model.Selected.MoveTo(targetPosition);
                 model.Selected.SetSelected(false);
                 model.SetSelectedPiece(null);
             }
@@ -166,7 +139,7 @@ namespace ChessGame
         public void NetClosed()
         {
             model.CurrentTurn = PieceColor.NONE;
-            mainCamera.WaitMode = true;
+            MainCamera.instance.WaitMode = true;
             hourglass.SetState(HourglassState.WAIT);
         }
 
@@ -178,7 +151,7 @@ namespace ChessGame
             model.RemoveAll();
             model.reinit();
             //
-            mainCamera.WaitMode = false;
+            MainCamera.instance.WaitMode = false;
             model.MyColor = initPack.color;
             changeGame(initPack.game);
         }

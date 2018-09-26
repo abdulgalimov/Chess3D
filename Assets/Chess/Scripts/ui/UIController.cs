@@ -6,12 +6,8 @@ namespace ChessGame
 {
 	public class UIController : MonoBehaviour {
 
+		[SerializeField]
 		private Text status;
-
-		private void Awake()
-		{
-			status = transform.Find("status").GetComponent<Text>();			
-		}
 
 		public void SetStatus(string value)
 		{

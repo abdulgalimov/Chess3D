@@ -6,11 +6,6 @@ namespace ChessGame.camera
 {
     public class CKnightAttackController : CameraController
     {
-        public CKnightAttackController()
-        {
-            
-        }
-
         public void Init(Piece fromPiece, Vector3 toPoint)
         {
             Vector3 direction = toPoint - fromPiece.transform.position;

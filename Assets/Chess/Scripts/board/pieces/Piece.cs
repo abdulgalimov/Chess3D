@@ -25,12 +25,11 @@ namespace ChessGame
 	
 	public class Piece : MonoBehaviour
 	{
-		private Position originPosition;
-
 		public PieceColor Color;
 		public PieceType Type;
 		public Position position = new Position();
-		public GameObject prefab;
+		
+		private static GameObject firePrefab;
 
 
 		private GameObject fire;
@@ -42,8 +41,13 @@ namespace ChessGame
 
 		public virtual void Start()
 		{
+			if (firePrefab == null)
+			{
+				firePrefab = (GameObject)Resources.Load("FireAura/FirePrefab", typeof(GameObject));
+			}
+			//
 			Vector3 pos = new Vector3(transform.position.x, transform.position.y+1, transform.position.z);
-			fire = Instantiate(prefab, pos, Quaternion.identity, transform);
+			fire = Instantiate(firePrefab, pos, Quaternion.identity, transform);
 			wall = fire.transform.Find("Fire wall").GetComponent<ParticleSystem>();
 			var main = wall.main;
 			main.simulationSpeed = 4;
@@ -51,7 +55,6 @@ namespace ChessGame
 			wall.Stop();
 			//
 			position = Coord.gameToModel(transform.position);
-			originPosition = position.Clone();
 			//
 			fireMaterial = wall.GetComponent<Renderer>().material;
 			fireTexture = fireMaterial.mainTexture;

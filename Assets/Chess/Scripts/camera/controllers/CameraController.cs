@@ -9,18 +9,12 @@ namespace ChessGame.camera
     }
     public class CameraController : EventEmitter
     {
-        static internal GameObject cameraObject;
         static internal Transform cameraParent;
         static internal Camera camera;
-        public static void Init(GameObject cameraObject)
+        public static void Init(Camera camera)
         {
-            CameraController.cameraObject = cameraObject;
-            cameraParent = cameraObject.transform.parent;
-            camera = cameraObject.GetComponent<Camera>();
-        }
-        public CameraController()
-        {
-            
+            cameraParent = camera.gameObject.transform.parent;
+            CameraController.camera = camera;
         }
 
         public void Exit()

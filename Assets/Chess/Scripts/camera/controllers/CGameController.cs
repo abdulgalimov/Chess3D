@@ -6,11 +6,6 @@ namespace ChessGame.camera
 {
     public class CGameController : CameraController
     {
-        public CGameController()
-        {
-            
-        }
-
         public override void Start()
         {
             cameraParent.DORotate(new Vector3(0, 0, 0), 0.5f);

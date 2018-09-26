@@ -7,8 +7,6 @@ namespace ChessGame
 {
     public class Knight : Piece
     {
-        public MainCamera mainCamera;
-        
         public override bool GetValidMove(Position to, Piece toPiece=null)
         {
             int dx = Math.Abs(position.x - to.x);
@@ -21,9 +19,9 @@ namespace ChessGame
             if (!position.Compare(moveConf.toPosition))
             {
                 position.Update(moveConf.toPosition);
-                if (mainCamera != null && moveConf.toPiece != null)
+                if (Color  == PieceColor.White && moveConf.toPiece != null)
                 {
-                    CameraController camera = mainCamera.KnightAttack(this, moveConf.toGamePosition);
+                    CameraController camera = MainCamera.instance.KnightAttack(this, moveConf.toGamePosition);
                     camera.on(CameraControllerEvents.ON_COMPLETE, e =>
                     {
                         playAnim(moveConf).onComplete += () =>

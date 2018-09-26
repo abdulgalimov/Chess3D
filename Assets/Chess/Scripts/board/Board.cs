@@ -13,13 +13,12 @@ public class Board : MonoBehaviour
 		//
 		area = transform.Find("selected_area");
 		area.transform.position = new Vector3(0, 13, 0);
-		aura = area.transform.GetComponent<ParticleSystem>();
+		aura = area.GetComponent<ParticleSystem>();
 		//
 		GameObject[] objects = GameObject.FindGameObjectsWithTag("piece");
 		foreach (GameObject obj in objects)
 		{
-			Piece piece = obj.GetComponent<Piece>();
-			piece.Release();
+			Destroy(obj);
 		}
 	}
 
