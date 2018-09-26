@@ -55,7 +55,7 @@ namespace ChessGame
             }
         }
 
-        private int _createdCount = 1500;
+        private int _createdCount = 0;
         private void Update()
         {
             if (_createdCount < maxCount)
