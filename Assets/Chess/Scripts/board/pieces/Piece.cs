@@ -1,33 +1,32 @@
 ﻿
 using System.Collections;
 using DG.Tweening;
-using UnityEditor;
 using UnityEngine;
 
 namespace ChessGame
 {
 	public enum PieceColor
 	{
-		NONE = 0,
+		None = 0,
 		White = 1,
 		Black = 2
 	}
 
 	public enum PieceType
 	{
-		PAWN, // пешка
-		ROOK, // ладья
-		KNIGHT, // конь
-		BISHOP, // слон
-		QUEEN, // королева
-		KING, // ферзь
+		Pawn,
+		Rook,
+		Knight,
+		Bishop,
+		Queen,
+		King
 	}
 	
 	public class Piece : MonoBehaviour
 	{
 		public PieceColor Color;
 		public PieceType Type;
-		public Position position = new Position();
+		public Position Position = new Position();
 		
 		private static GameObject firePrefab;
 
@@ -46,7 +45,7 @@ namespace ChessGame
 				firePrefab = (GameObject)Resources.Load("FireAura/FirePrefab", typeof(GameObject));
 			}
 			//
-			Vector3 pos = new Vector3(transform.position.x, transform.position.y+1, transform.position.z);
+			var pos = new Vector3(transform.position.x, transform.position.y+1, transform.position.z);
 			fire = Instantiate(firePrefab, pos, Quaternion.identity, transform);
 			wall = fire.transform.Find("Fire wall").GetComponent<ParticleSystem>();
 			var main = wall.main;
@@ -54,20 +53,20 @@ namespace ChessGame
 			main.startColor = null;
 			wall.Stop();
 			//
-			position = Coord.gameToModel(transform.position);
+			Position = Coordinates.GameToModel(transform.position);
 			//
 			fireMaterial = wall.GetComponent<Renderer>().material;
 			fireTexture = fireMaterial.mainTexture;
 		}
 
-		private void onChangeTurn(Event e)
+		private void OnChangeTurn(Event e)
 		{
-			setFireTexture();
+			SetFireTexture();
 		}
 
-		private void setFireTexture()
+		private void SetFireTexture()
 		{
-			if (GameModel.instance.IsMyTurn)
+			if (GameModel.Instance.IsMyTurn)
 			{
 				fireMaterial.mainTexture = fireTexture;				
 			}
@@ -86,13 +85,13 @@ namespace ChessGame
 			
 			if (selected)
 			{
-				setFireTexture();
-				GameModel.instance.on("changeTurn", onChangeTurn);
+				SetFireTexture();
+				GameModel.Instance.On("changeTurn", OnChangeTurn);
 				wall.Play();
 			}
 			else
 			{
-				GameModel.instance.off("changeTurn", onChangeTurn);
+				GameModel.Instance.Off("changeTurn", OnChangeTurn);
 				wall.Stop();
 			}
 		}
@@ -104,13 +103,10 @@ namespace ChessGame
 
 		public virtual void MoveTo(MoveConf moveConf)
 		{
-			position.Update(moveConf.toPosition);
-			transform.DOMove(moveConf.toGamePosition, 0.5f);
+			Position.Update(moveConf.ToPosition);
+			transform.DOMove(moveConf.ToGamePosition, 0.5f);
 			//
-			if (moveConf.toPiece != null)
-			{
-				moveConf.toPiece.piece.Kill();
-			}
+			moveConf.ToPiece?.Piece.Kill();
 		}
 
 

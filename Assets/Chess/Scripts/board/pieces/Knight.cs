@@ -1,5 +1,4 @@
 using System;
-using ChessGame.camera;
 using DG.Tweening;
 using UnityEngine;
 
@@ -9,60 +8,53 @@ namespace ChessGame
     {
         public override bool GetValidMove(Position to, Piece toPiece=null)
         {
-            int dx = Math.Abs(position.x - to.x);
-            int dy = Math.Abs(position.y - to.y);
+            var dx = Math.Abs(Position.X - to.X);
+            var dy = Math.Abs(Position.Y - to.Y);
             return (dx == 2 && dy == 1 || dx == 1 && dy == 2) && (toPiece == null || toPiece.Color != Color);
         }
         
         public override void MoveTo(MoveConf moveConf)
         {
-            if (!position.Compare(moveConf.toPosition))
+            if (Position.Compare(moveConf.ToPosition)) return;
+            
+            Position.Update(moveConf.ToPosition);
+            if (Color  == PieceColor.White && moveConf.ToPiece != null)
             {
-                position.Update(moveConf.toPosition);
-                if (Color  == PieceColor.White && moveConf.toPiece != null)
+                var cameraController = MainCamera.Instance.KnightAttack(this, moveConf.ToGamePosition);
+                cameraController.On(CameraControllerEvents.OnComplete, e =>
                 {
-                    CameraController camera = MainCamera.instance.KnightAttack(this, moveConf.toGamePosition);
-                    camera.on(CameraControllerEvents.ON_COMPLETE, e =>
+                    PlayAnim(moveConf).onComplete += () =>
                     {
-                        playAnim(moveConf).onComplete += () =>
-                        {
-                            camera.Exit();
-                        };                        
-                    });
-                }
-                else
-                {
-                    playAnim(moveConf);
-                }
+                        cameraController.Exit();
+                    };                        
+                });
+            }
+            else
+            {
+                PlayAnim(moveConf);
             }
         }
 
-        private Tween playAnim(MoveConf moveConf)
+        private Tween PlayAnim(MoveConf moveConf)
         {
-            if (moveConf.toPiece != null)
-            {
-                moveConf.toPiece.piece.Kill(0.2f);
-            }
-            //
-            Vector3 targetPos = moveConf.toGamePosition;
-            Vector3 center = new Vector3();
+            moveConf.ToPiece?.Piece.Kill(0.2f);
+            
+            var targetPos = moveConf.ToGamePosition;
+            var center = Vector3.zero;
             center.x = transform.position.x + (targetPos.x - transform.position.x) * .7f;
             center.y = 25;
             center.z = transform.position.z + (targetPos.z - transform.position.z) * .7f;
-            Vector3[] waypoints =
+            Vector3[] points =
             {
                 center,
                 targetPos
             };
             transform
-                .DOPath(waypoints, 2.8f, PathType.CatmullRom)
-                .SetEase((t, d, c, b) =>
-                {
-                    return c*((t=t/d-1)*t*t*t*t+1)+b;
-                });
-            //
-            //
-            float dir = (float)(Math.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z)*180/Math.PI) + 90;
+                .DOPath(points, 2.8f, PathType.CatmullRom)
+                .SetEase((t, d, c, b) => c*((t=t/d-1)*t*t*t*t+1)+b);
+            
+            
+            var dir = (float)(Math.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z)*180/Math.PI) + 90;
             return DOTween.Sequence()
                 .Append(transform.DORotate(new Vector3(0, dir, 0), 0.2f))
                 .Append(transform.DORotate(new Vector3(5, dir, -10), 0.3f).SetEase(Ease.OutExpo))

@@ -18,44 +18,44 @@ namespace ChessGame
             //
             PieceFactory.Init(board.gameObject);
             //
-            model.on("changeTurn", onChangeTurn);
-            model.reinit();
+            model.On("changeTurn", OnChangeTurn);
+            model.Init();
         }
 
-        private bool _isSelected;
+        private bool isDown;
         private void Update()
         {
             if (model.IsMyTurn)
             {
-                if (_isSelected)
+                if (isDown)
                 {
-                    RaycastHit hit;
-                    if (getHit(out hit))
+                    RaycastHit hit = GetHit();
+                    if (hit.transform != null)
                     {
-                        move(hit);
+                        MouseMove(hit);
                     }
                 }
             }
             //
             if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit hit;
-                if (getHit(out hit))
+                var hit = GetHit();
+                if (hit.transform != null)
                 {
-                    down(hit);
+                    MouseDown(hit);
                 }
-                _isSelected = true;
+                isDown = true;
             }
             //
             if (Input.GetMouseButtonUp(0))
             {
-                _isSelected = false;
+                isDown = false;
                 if (model.IsMyTurn)
                 {
-                    RaycastHit hit;
-                    if (getHit(out hit))
+                    var hit = GetHit();
+                    if (hit.transform != null)
                     {
-                        up(hit);
+                        MouseUp(hit);
                     }
                     model.DisableMy(false);                
                 }
@@ -63,20 +63,16 @@ namespace ChessGame
         }
         
         // raycast begin ********************************************************************************
-        private bool getHit(out RaycastHit hit)
+        private static RaycastHit GetHit()
         {
-            Ray ray = MainCamera.instance.GetCamera().ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                return true;
-            }
-
-            return false;
+            var ray = MainCamera.Instance.GetCamera().ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Physics.Raycast(ray, out hit);
+            return hit;
         }
-        private void down(RaycastHit hit)
+        private void MouseDown(RaycastHit hit)
         {
-            Piece piece = hit.transform.GetComponent<Piece>();
+            var piece = hit.transform.GetComponent<Piece>();
             if (piece)
             {
                 model.SetSelectedPiece(piece);
@@ -87,82 +83,80 @@ namespace ChessGame
             //
             model.DisableMy(true);
             board.AuraVisible(model.Selected != null);
-            move(hit);
+            MouseMove(hit);
         }
 
-        private void move(RaycastHit hit)
+        private void MouseMove(RaycastHit hit)
         {
-            if (!_isSelected) return;
+            if (!isDown) return;
             //
-            Position targetPosition = Coord.gameToModel(hit.point);
-            bool valid = model.GetValidMove(targetPosition);
+            var targetPosition = Coordinates.GameToModel(hit.point);
+            var valid = model.GetValidMove(targetPosition);
             board.AuraValid(valid);
             board.AuraPosition(targetPosition);
         }
 
-        private void up(RaycastHit hit)
+        private void MouseUp(RaycastHit hit)
         {
             model.DisableMy(false);
             board.AuraVisible(false);
             //
-            Position targetPosition = Coord.gameToModel(hit.point);
-            bool valid = model.GetValidMove(targetPosition);
-            if (valid)
-            {
-                net.SendMove(model.Selected.position, targetPosition);
-                //
-                model.MovePiece(model.Selected.position, targetPosition);
-                model.Selected.SetSelected(false);
-                model.SetSelectedPiece(null);
-            }
+            var targetPosition = Coordinates.GameToModel(hit.point);
+            var valid = model.GetValidMove(targetPosition);
+            if (!valid) return;
+            net.SendMove(model.Selected.Position, targetPosition);
+            //
+            model.MovePiece(model.Selected.Position, targetPosition);
+            model.Selected.SetSelected(false);
+            model.SetSelectedPiece(null);
         }
         // raycast end ********************************************************************************
 
-        private void changeGame(GamePack gamePack)
+        private void ChangeGame(GamePack gamePack)
         {
             model.CurrentTurn = gamePack.turn;            
         }
 
-        private void onChangeTurn(Event e)
+        private void OnChangeTurn(Event e)
         {
             if (!model.IsMyTurn)
             {
                 model.SetSelectedPiece(null);
-                hourglass.SetState(HourglassState.OPP_TURN);
+                hourglass.SetState(HourglassState.OppTurn);
             }
             else
             {
-                hourglass.SetState(HourglassState.MY_TURN);
+                hourglass.SetState(HourglassState.MyTurn);
             }
         }
 
         public void NetClosed()
         {
-            model.CurrentTurn = PieceColor.NONE;
-            MainCamera.instance.WaitMode = true;
-            hourglass.SetState(HourglassState.WAIT);
+            model.CurrentTurn = PieceColor.None;
+            MainCamera.Instance.WaitMode = true;
+            hourglass.SetState(HourglassState.Wait);
         }
 
         public void Init(InitPack initPack)
         {
             STime.Init(initPack.serverTime);
             //
-            _isSelected = false;
+            isDown = false;
             model.RemoveAll();
-            model.reinit();
+            model.Init();
             //
-            MainCamera.instance.WaitMode = false;
+            MainCamera.Instance.WaitMode = false;
             model.MyColor = initPack.color;
-            changeGame(initPack.game);
+            ChangeGame(initPack.game);
         }
         public void Move(MovePack movePack)
         {
             model.MovePiece(movePack.from, movePack.to);
-            changeGame(movePack.game);
+            ChangeGame(movePack.game);
         }
         public void UpdateGame(GamePack gamePack) 
         {
-            changeGame(gamePack);
+            ChangeGame(gamePack);
         }
     }
 }

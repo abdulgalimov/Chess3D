@@ -3,17 +3,12 @@ using UnityEngine;
 
 namespace ChessGame
 {
-    public class STime
+    public static class STime
     {
-        private static double _dtime;
+        private static double deltaServerTime;
         public static void Init(int serverTime)
         {
-            _dtime = DateTime.Now.TimeOfDay.TotalSeconds-serverTime;
-        }
-
-        public static DateTime Now
-        {
-            get { return DateTime.Now.AddMilliseconds(_dtime); }
+            deltaServerTime = DateTime.Now.TimeOfDay.TotalSeconds-serverTime;
         }
     }
 }

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace ChessGame
 {
-    public class NetActions
+    public static class NetActions
     {
         public const string Connected = "connected";
         public const string Closed = "closed";
@@ -16,78 +16,84 @@ namespace ChessGame
     }
     public class NetController : MonoBehaviour
     {
-        public EventEmitter emitter = new EventEmitter();
+        public readonly EventEmitter Emitter = new EventEmitter();
 
         private WebSocket ws;
         private byte[] sendBytes;
-        void Start () {
-            reconnect();
+
+        private void Start () {
+            Reconnect();
         }
 
-        private void reconnect()
+        private void Reconnect()
         {
-            _connected = false;
+            connected = false;
 #if UNITY_EDITOR
-            string url = "ws://127.0.0.1:1551";
+            const string url = "ws://127.0.0.1:1551";
 #else
-            string url = "ws://abdulgalimov.com:1551";
+            const string url = "ws://abdulgalimov.com:1551";
 #endif
             ws = new WebSocket(new Uri(url));
-            MainController.instance.StartCoroutine(ws.Connect());            
+            MainController.Instance.StartCoroutine(ws.Connect());            
         }
 
-        private bool _connected;
-        void Update()
+        private bool connected;
+        private void Update()
         {
             if (ws.IsClosed())
             {
-                emitter.emit(NetActions.Closed);
-                reconnect();
+                Emitter.Emit(NetActions.Closed);
+                Reconnect();
                 return;
             }
 
-            if (ws.IsConnected() && !_connected)
+            if (ws.IsConnected() && !connected)
             {
-                emitter.emit(NetActions.Connected);
-                _connected = true;
+                Emitter.Emit(NetActions.Connected);
+                connected = true;
             }
             //
-            string receiveData = ws.RecvString();
+            var receiveData = ws.RecvString();
             if (receiveData != null)
             {
-                _parseReceiveData(receiveData);
+                ParseReceiveData(receiveData);
             }
         }
 
-        private void _parseReceiveData(string receiveData)
+        private void ParseReceiveData(string receiveData)
         {
-            ReceivePack pack = JsonConvert.DeserializeObject<ReceivePack>(receiveData);
+            var pack = JsonConvert.DeserializeObject<ReceivePack>(receiveData);
             //
             if (pack.data != null)
             {
                 pack.data = Regex.Unescape(pack.data);
             }
+
             switch (pack.action)
             {
                 case NetActions.Init:
-                    InitPack initPack = JsonConvert.DeserializeObject<InitPack>(pack.data);
+                {
+                    var initPack = JsonConvert.DeserializeObject<InitPack>(pack.data);
                     initPack.game = pack.game;
-                    emitter.emit(NetActions.Init, initPack);
+                    Emitter.Emit(NetActions.Init, initPack);
                     break;
+                }
                 case NetActions.Move:
-                    MovePack movePack = JsonConvert.DeserializeObject<MovePack>(pack.data);
+                {
+                    var movePack = JsonConvert.DeserializeObject<MovePack>(pack.data);
                     movePack.game = pack.game;
-                    emitter.emit(NetActions.Move, movePack);
+                    Emitter.Emit(NetActions.Move, movePack);
                     break;
+                }
                 case NetActions.Game:
-                    emitter.emit(NetActions.Game, pack.game);
+                    Emitter.Emit(NetActions.Game, pack.game);
                     break;
-            }            
+            }
         }
         
-        private void sendData(object data)
+        private void SendData(object data)
         {
-            string str = JsonConvert.SerializeObject(data);
+            var str = JsonConvert.SerializeObject(data);
             ws.SendString(str);
         }
         
@@ -95,10 +101,8 @@ namespace ChessGame
 
         public void SendMove(Position from, Position to)
         {
-            SendPack data = new SendPack();
-            data.action = "move";
-            data.data = new MovePack(from, to);
-            sendData(data);
+            var data = new SendPack {action = "move", data = new MovePack(from, to)};
+            SendData(data);
         }
     }
     

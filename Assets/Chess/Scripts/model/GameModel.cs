@@ -9,111 +9,100 @@ namespace ChessGame
 {
     public class MoveConf
     {
-        public Position toPosition;
-        public PieceConf fromPiece;
-        public PieceConf toPiece;
-        public Vector3 toGamePosition;
+        public Position ToPosition;
+        public PieceConf FromPiece;
+        public PieceConf ToPiece;
+        public Vector3 ToGamePosition;
     }
     
     public class GameModel : EventEmitter
     {
-        public static GameModel instance;
+        public static GameModel Instance;
         private List<PieceConf> pieces;
         public GameModel()
         {
-            instance = this;
+            Instance = this;
         }
 
-        private void createPiece(PieceColor color, PieceType type, int x, int y)
+        private void CreatePiece(PieceColor color, PieceType type, int x, int y)
         {
-            PieceConf conf = PieceFactory.CreatePiece(color, type);
+            var conf = PieceFactory.CreatePiece(color, type);
             if (conf == null) return;
             //
             y = color == PieceColor.White ? y : 7 - y;
-            Position posModel = new Position(x, y);
-            conf.gameObject.transform.position = Coord.modelToGame(posModel);
+            var posModel = new Position(x, y);
+            conf.Object.transform.position = Coordinates.ModelToGame(posModel);
             //
             pieces.Add(conf);
         }
-        private void createColor(PieceColor color)
+        private void CreateColor(PieceColor color)
         {
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
-                createPiece(color, PieceType.PAWN, i, 1);
+                CreatePiece(color, PieceType.Pawn, i, 1);
             }            
-            createPiece(color, PieceType.ROOK, 0, 0);
-            createPiece(color, PieceType.ROOK, 7, 0);
-            createPiece(color, PieceType.KNIGHT, 1, 0);
-            createPiece(color, PieceType.KNIGHT, 6, 0);
-            createPiece(color, PieceType.BISHOP, 2, 0);
-            createPiece(color, PieceType.BISHOP, 5, 0);
-            createPiece(color, PieceType.QUEEN, 3, 0);
-            createPiece(color, PieceType.KING, 4, 0);
+            CreatePiece(color, PieceType.Rook, 0, 0);
+            CreatePiece(color, PieceType.Rook, 7, 0);
+            CreatePiece(color, PieceType.Knight, 1, 0);
+            CreatePiece(color, PieceType.Knight, 6, 0);
+            CreatePiece(color, PieceType.Bishop, 2, 0);
+            CreatePiece(color, PieceType.Bishop, 5, 0);
+            CreatePiece(color, PieceType.Queen, 3, 0);
+            CreatePiece(color, PieceType.King, 4, 0);
         }
-        public void reinit()
+        public void Init()
         {
             pieces = new List<PieceConf>();
             //
-            createColor(PieceColor.White);
-            createColor(PieceColor.Black);            
+            CreateColor(PieceColor.White);
+            CreateColor(PieceColor.Black);            
             
         }
 
-        private PieceColor _myColor;
+        private PieceColor myColor;
         public PieceColor MyColor
         {
-            set { _myColor = value; }
+            set { myColor = value; }
         }
 
-        public bool IsMyTurn
-        {
-            get {return _currentTurn != 0 && _currentTurn == _myColor;}
-        }
+        public bool IsMyTurn => currentTurn != 0 && currentTurn == myColor;
 
-        private PieceColor _currentTurn = 0;
+        private PieceColor currentTurn = 0;
         public PieceColor CurrentTurn
         {
             set
             {
-                if (_currentTurn != value)
-                {
-                    _currentTurn = value;
-                    emit("changeTurn");
-                }
+                if (currentTurn == value) return;
+                currentTurn = value;
+                Emit("changeTurn");
             }
         }
 
-        private Piece _selected;
-        public Piece Selected
-        {
-            get { return _selected; }
-        }
+        public Piece Selected { get; private set; }
 
         public void SetSelectedPiece(Piece piece)
         {
-            if (_selected != null)
+            if (Selected != null)
             {
-                emit("unselected", _selected);
-                _selected.SetSelected(false);
-                if (_selected == piece)
+                Emit("unselected", Selected);
+                Selected.SetSelected(false);
+                if (Selected == piece)
                 {
                     piece = null;
                 }
             }
             //
-            _selected = piece;
-            if (_selected != null)
-            {
-                emit("selected", _selected);
-                _selected.SetSelected(true);
-            }
+            Selected = piece;
+            if (Selected == null) return;
+            Emit("selected", Selected);
+            Selected.SetSelected(true);
         }
 
         private PieceConf GetPieceByPosition(Position position)
         {
-            foreach (PieceConf conf in pieces)
+            foreach (var conf in pieces)
             {
-                if (conf.piece.position.Compare(position))
+                if (conf.Piece.Position.Compare(position))
                 {
                     return conf;
                 }
@@ -121,79 +110,71 @@ namespace ChessGame
             return null;
         }
 
-        private bool _disableMy;
+        private bool disableMy;
         public void DisableMy(bool disable)
         {
-            if (_disableMy == disable) return;
-            _disableMy = disable;
+            if (disableMy == disable) return;
+            disableMy = disable;
             //
-            foreach (PieceConf conf in pieces)
+            foreach (var conf in pieces)
             {
-                if (conf.collider != null)
+                if (conf.Collider != null)
                 {
-                    conf.collider.enabled = !disable;
+                    conf.Collider.enabled = !disable;
                 }
             }
         }
 
         public bool GetValidMove(Position pos)
         {
-            if (!_selected || _selected.position.Compare(pos)) return false;
+            if (!Selected || Selected.Position.Compare(pos)) return false;
             //
-            PieceConf toConf = GetPieceByPosition(pos);
+            var toConf = GetPieceByPosition(pos);
             //
-            bool valid = _selected.GetValidMove(pos, toConf!=null ? toConf.piece : null);
+            var valid = Selected.GetValidMove(pos, toConf?.Piece);
             if (!valid) return false;
             //
-            if (_selected.Type != PieceType.KNIGHT)
+            if (Selected.Type == PieceType.Knight) return true;
+            
+            var dx = pos.X != Selected.Position.X ? (pos.X - Selected.Position.X)/Math.Abs(pos.X - Selected.Position.X) : 0;
+            var dy = pos.Y != Selected.Position.Y ? (pos.Y - Selected.Position.Y)/Math.Abs(pos.Y - Selected.Position.Y) : 0;
+            var temp = Selected.Position.Clone();
+            while (!temp.Compare(pos))
             {
-                int dx = pos.x != _selected.position.x ? (pos.x - _selected.position.x)/Math.Abs(pos.x - _selected.position.x) : 0;
-                int dy = pos.y != _selected.position.y ? (pos.y - _selected.position.y)/Math.Abs(pos.y - _selected.position.y) : 0;
-                Position temp = _selected.position.Clone();
-                while (!temp.Compare(pos))
+                temp.X += dx;
+                temp.Y += dy;
+                var conf = GetPieceByPosition(temp);
+                if (conf == null) continue;
+                if (temp.Compare(pos))
                 {
-                    temp.x += dx;
-                    temp.y += dy;
-                    PieceConf conf = GetPieceByPosition(temp);
-                    if (conf != null)
-                    {
-                        if (temp.Compare(pos))
-                        {
-                            return conf.piece.Color != _myColor;                            
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
+                    return conf.Piece.Color != myColor;                            
                 }
+                return false;
             }
-            //
+            
             return true;
         }
         
         public void MovePiece(Position from , Position to)
         {
-            MoveConf moveConf = new MoveConf();
-            moveConf.toPosition = to;
-            moveConf.fromPiece = GetPieceByPosition(from);
-            if (moveConf.fromPiece == null) return;
+            var moveConf = new MoveConf {ToPosition = to, FromPiece = GetPieceByPosition(from)};
+            if (moveConf.FromPiece == null) return;
             //
-            moveConf.toPiece = GetPieceByPosition(to);
-            if (moveConf.toPiece != null)
+            moveConf.ToPiece = GetPieceByPosition(to);
+            if (moveConf.ToPiece != null)
             {
-                pieces.Remove(moveConf.toPiece);
+                pieces.Remove(moveConf.ToPiece);
             }
-            moveConf.toGamePosition = Coord.modelToGame(moveConf.toPosition);
+            moveConf.ToGamePosition = Coordinates.ModelToGame(moveConf.ToPosition);
             //
-            moveConf.fromPiece.piece.MoveTo(moveConf);
+            moveConf.FromPiece.Piece.MoveTo(moveConf);
         }
 
         public void RemoveAll()
         {
-            foreach (PieceConf piece in pieces)
+            foreach (var piece in pieces)
             {
-                piece.piece.Release();
+                piece.Piece.Release();
             }
         }
     }

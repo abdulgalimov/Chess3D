@@ -8,13 +8,13 @@ namespace ChessGame
         {
             base.Start();
             //
-            Type = PieceType.KING;
+            Type = PieceType.King;
         }
         
         public override bool GetValidMove(Position to, Piece toPiece=null)
         {
-            int dx = Math.Abs(position.x - to.x);
-            int dy = Math.Abs(position.y - to.y);
+            var dx = Math.Abs(Position.X - to.X);
+            var dy = Math.Abs(Position.Y - to.Y);
             return dx == dy || dx == 0 || dy == 0;
         }
     }

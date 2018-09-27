@@ -4,59 +4,59 @@ namespace ChessGame
 {
     public class MainController : MonoBehaviour
     {
-        public static MainController instance;
+        public static MainController Instance;
         
         [SerializeField]
         private GameController game;
         [SerializeField]
         private UIController ui;
         [SerializeField]
-        private MainCamera camera;
+        private MainCamera mainCamera;
         [SerializeField]
         private NetController net;
         
-        void Awake()
+        private void Awake()
         {
-            instance = this;
+            Instance = this;
         }
 
         private void Start()
         {
-            net.emitter.on(NetActions.Connected, onNetConnected);
-            net.emitter.on(NetActions.Closed, onNetClosed);
-            net.emitter.on(NetActions.Init, onNetInit);
-            net.emitter.on(NetActions.Move, onNetMove);
-            net.emitter.on(NetActions.Game, onNetGame);
+            net.Emitter.On(NetActions.Connected, OnNetConnected);
+            net.Emitter.On(NetActions.Closed, OnNetClosed);
+            net.Emitter.On(NetActions.Init, OnNetInit);
+            net.Emitter.On(NetActions.Move, OnNetMove);
+            net.Emitter.On(NetActions.Game, OnNetGame);
             //
             ui.SetStatus("Connection in progress");
-            camera.WaitMode = true;
+            mainCamera.WaitMode = true;
         }
 
-        private void onNetConnected(Event e)
+        private void OnNetConnected(Event e)
         {
             ui.SetStatus("Search for an opponent");
         }
-        private void onNetClosed(Event e)
+        private void OnNetClosed(Event e)
         {
             ui.SetVisible(true);
             ui.SetStatus("Connection aborted");
             game.NetClosed();
         }
-        private void onNetInit(Event e)
+        private void OnNetInit(Event e)
         {
-            InitPack initPack = (InitPack) e.Data;
+            var initPack = (InitPack) e.Data;
             //
             game.Init(initPack);
             ui.SetVisible(false);
         }
-        private void onNetMove(Event e)
+        private void OnNetMove(Event e)
         {
-            MovePack movePack = (MovePack)e.Data;
+            var movePack = (MovePack)e.Data;
             game.Move(movePack);
         }
-        private void onNetGame(Event e)
+        private void OnNetGame(Event e)
         {
-            GamePack gamePack = (GamePack)e.Data;
+            var gamePack = (GamePack)e.Data;
             game.UpdateGame(gamePack);
         }
     }

@@ -1,25 +1,25 @@
 using UnityEngine;
 
-namespace ChessGame.camera
+namespace ChessGame
 {
-    public class CameraControllerEvents
+    public static class CameraControllerEvents
     {
-        public static readonly string ON_COMPLETE = "onComplete";
-        public static readonly string ON_EXIT = "onExit";
+        public const string OnComplete = "onComplete";
+        public const string OnExit = "onExit";
     }
     public class CameraController : EventEmitter
     {
-        static internal Transform cameraParent;
-        static internal Camera camera;
+        protected static Transform CameraParent;
+        protected static Camera CameraObject;
         public static void Init(Camera camera)
         {
-            cameraParent = camera.gameObject.transform.parent;
-            CameraController.camera = camera;
+            CameraParent = camera.gameObject.transform.parent;
+            CameraObject = camera;
         }
 
         public void Exit()
         {
-            emit(CameraControllerEvents.ON_EXIT);
+            Emit(CameraControllerEvents.OnExit);
         }
         
         public virtual void Start()
@@ -34,7 +34,7 @@ namespace ChessGame.camera
 
         public virtual void Update()
         {
-            cameraParent.Rotate(new Vector3(0, 1, 0), 0.3f);            
+            CameraParent.Rotate(new Vector3(0, 1, 0), 0.3f);            
         }
     }
 }

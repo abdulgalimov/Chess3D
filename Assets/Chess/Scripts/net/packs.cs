@@ -1,11 +1,9 @@
-using System;
 
 namespace ChessGame
 {
     public class ReceivePack
     {
         public string action;
-        public int id;
         public string data;
         public GamePack game;
     }
@@ -29,7 +27,7 @@ namespace ChessGame
 
         public override string ToString()
         {
-            return String.Format("MovePack from: {0}, to: {1}", from, to);
+            return $"MovePack from: {from}, to: {to}";
         }
     }
 

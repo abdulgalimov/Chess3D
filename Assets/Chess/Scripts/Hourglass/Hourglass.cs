@@ -1,15 +1,14 @@
-using System;
-using System.Collections;
 using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace ChessGame
 {
     public enum HourglassState
     {
-        WAIT,
-        MY_TURN,
-        OPP_TURN
+        Wait,
+        MyTurn,
+        OppTurn
     }
     public class Hourglass : MonoBehaviour
     {
@@ -20,99 +19,100 @@ namespace ChessGame
         {
             sandPrefab = (GameObject)Resources.Load("Hourglass/SandItemPref", typeof(GameObject));
             //
-            _sandsRigidbody = new GameObject[maxCount];
+            sandItems = new GameObject[MaxCount];
         }
 
-        private readonly Vector3 _createCenter = new Vector3(41.0f, 27.0f, -4.2f);
-        private readonly float createScale = 0.00024f;
-        private readonly float createRadius = .8f;
-        private readonly int maxCount = 1300;
-        private GameObject[] _sandsRigidbody;
-        private void createSand()
+        private readonly Vector3 createCenter = new Vector3(41.0f, 27.0f, -4.2f);
+        private const float CreateScale = 0.00024f;
+        private const float CreateRadius = .8f;
+        private const int MaxCount = 1300;
+        private GameObject[] sandItems;
+        private void CreateSand()
         {
-            Vector3 pos = new Vector3(_createCenter.x ,_createCenter.y, transform.position.z);
-            pos.x += UnityEngine.Random.Range(-createRadius, createRadius);
-            pos.y += UnityEngine.Random.Range(-createRadius, createRadius);
-            pos.z += UnityEngine.Random.Range(-createRadius, createRadius);
+            var pos = new Vector3(createCenter.x ,createCenter.y, transform.position.z);
+            pos.x += Random.Range(-CreateRadius, CreateRadius);
+            pos.y += Random.Range(-CreateRadius, CreateRadius);
+            pos.z += Random.Range(-CreateRadius, CreateRadius);
             //
-            GameObject obj = Instantiate(sandPrefab, pos, Quaternion.identity, rotateCont);
-            obj.transform.localScale = new Vector3(createScale, createScale, createScale);
+            var obj = Instantiate(sandPrefab, pos, Quaternion.identity, rotateCont);
+            obj.transform.localScale = new Vector3(CreateScale, CreateScale, CreateScale);
             //
-            _sandsRigidbody[_createdCount] = obj;
+            sandItems[createdCount] = obj;
             //
-            _createdCount++;
+            createdCount++;
         }
 
-        private void destroyAll()
+        private void DestroyAll()
         {
-            _createdCount = maxCount;
-            for (int i = 0; i < maxCount; i++)
+            createdCount = MaxCount;
+            for (var i = 0; i < MaxCount; i++)
             {
-                if (_sandsRigidbody[i] != null)
+                if (sandItems[i] != null)
                 {
-                    Destroy(_sandsRigidbody[i]);
+                    Destroy(sandItems[i]);
                 }
             }
         }
 
-        private int _createdCount = 0;
+        private int createdCount;
         private void Update()
         {
-            if (_createdCount < maxCount)
-            {
-                for (int i=0; i<30 && _createdCount < maxCount; i++) createSand();
-            }
+            if (createdCount >= MaxCount) return;
+            
+            for (var i=0; i<30 && createdCount < MaxCount; i++) CreateSand();
         }
 
-        private Tweener _tween;
-        private HourglassState _state = HourglassState.WAIT;
+        private Tweener tween;
+        private HourglassState hourglassState = HourglassState.Wait;
         public void SetState(HourglassState state)
         {
-            if (_state == state) return;
+            if (hourglassState == state) return;
             //
-            _state = state;
-            int rotateAngle = 0;
-            int moveTo = 0;
-            switch (_state)
+            hourglassState = state;
+            var rotateAngle = 0;
+            int moveTo;
+            switch (hourglassState)
             {
-                case HourglassState.WAIT:
+                case HourglassState.Wait:
                     moveTo = -4;
                     break;
-                case HourglassState.MY_TURN:
+                case HourglassState.MyTurn:
                     rotateAngle = 180;
                     moveTo = -4-20;
                     break;
-                case HourglassState.OPP_TURN:
+                case HourglassState.OppTurn:
                     rotateAngle = -180;
                     moveTo = -4+20;
                     break;
+                default:
+                    return;
             }
 
             transform
                 .DOMoveZ(moveTo, 0.6f)
                 .SetEase(Ease.OutBack);
             //
-            destroyAll();
-            if (_tween != null)
+            DestroyAll();
+            if (tween != null)
             {
-                _tween.Kill(true);
-                _createdCount = maxCount;
+                tween.Kill(true);
+                createdCount = MaxCount;
             }
 
             if (rotateAngle != 0)
             {
-                _tween = rotateCont
+                tween = rotateCont
                     .DORotate(new Vector3(rotateAngle, 0, 0), 1.5f, RotateMode.LocalAxisAdd)
                     .SetEase(Ease.OutBack);
-                _tween.OnComplete(onComplete);
+                tween.OnComplete(OnComplete);
             }
 
         }
 
-        private void onComplete()
+        private void OnComplete()
         {
-            _tween = null;
-            _createdCount = 0;            
+            tween = null;
+            createdCount = 0;            
         }
     }
 }

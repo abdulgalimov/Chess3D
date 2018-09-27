@@ -8,28 +8,27 @@ namespace ChessGame
         public override void Start()
         {
             base.Start();
-            //
-            Type = PieceType.PAWN;
+            
+            Type = PieceType.Pawn;
         }
         
         public override bool GetValidMove(Position to, Piece toPiece=null)
         {
             if (toPiece)
             {
-                int dx = Math.Abs(toPiece.position.x - position.x);
-                int dy = toPiece.position.y - position.y;
+                var dx = Math.Abs(toPiece.Position.X - Position.X);
+                var dy = toPiece.Position.Y - Position.Y;
                 return dx == 1 && dy == 1 && toPiece != null && toPiece.Color != Color;
             }
-            //
-            if (position.x != to.x) return false;
-            int delta = to.y - position.y;
-            if (position.y <= 2)
+            
+            if (Position.X != to.X) return false;
+            var delta = to.Y - Position.Y;
+            if (Position.Y <= 2)
             {
                 return delta > 0 && delta < 3;
-            } else
-            {
-                return delta == 1;                
             }
+            
+            return delta == 1;
         }
     }
 }

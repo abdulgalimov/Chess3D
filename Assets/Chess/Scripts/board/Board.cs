@@ -1,63 +1,57 @@
-﻿using ChessGame;
-using UnityEngine;
+﻿using UnityEngine;
 using DG.Tweening;
 
-public class Board : MonoBehaviour
+namespace ChessGame
 {
-	[SerializeField]
-	private Transform area;
-	private ParticleSystem aura;
-
-	void Start ()
+	public class Board : MonoBehaviour
 	{
-		area.transform.position = new Vector3(0, 13, 0);
-		aura = area.GetComponent<ParticleSystem>();
-		//
-		GameObject[] objects = GameObject.FindGameObjectsWithTag("piece");
-		foreach (GameObject obj in objects)
+		[SerializeField]
+		private Transform area;
+		private ParticleSystem aura;
+
+		private void Start ()
 		{
-			Destroy(obj);
-		}
-	}
-
-
-	private bool _auraValid;
-	public void AuraValid(bool visible)
-	{
-		if (_auraValid == visible) return;
-		_auraValid = visible;
-		//
-		var main = aura.main;
-		main.startColor = visible ? new ParticleSystem.MinMaxGradient(Color.green) : new ParticleSystem.MinMaxGradient(Color.red);
-		aura.time = 0;
-		aura.Play();
-	}
-
-	private Position _auraPosition = new Position(-5, -5);
-	public void AuraPosition(Position position)
-	{
-		if (!_auraPosition.Compare(position))
-		{
-			_auraPosition.Update(position);
+			area.transform.position = new Vector3(0, 13, 0);
+			aura = area.GetComponent<ParticleSystem>();
 			//
-			Vector3 pos = Coord.modelToGame(_auraPosition);
+			var objects = GameObject.FindGameObjectsWithTag("piece");
+			foreach (var obj in objects)
+			{
+				Destroy(obj);
+			}
+		}
+
+
+		private bool auraValid;
+		public void AuraValid(bool visible)
+		{
+			if (auraValid == visible) return;
+			auraValid = visible;
+			//
+			var main = aura.main;
+			main.startColor = visible ? new ParticleSystem.MinMaxGradient(Color.green) : new ParticleSystem.MinMaxGradient(Color.red);
+			aura.time = 0;
+			aura.Play();
+		}
+
+		private readonly Position auraPosition = new Position(-5, -5);
+		public void AuraPosition(Position position)
+		{
+			if (auraPosition.Compare(position)) return;
+			auraPosition.Update(position);
+			
+			var pos = Coordinates.ModelToGame(auraPosition);
 			area.transform.DOMove(pos, 0.4f);
 		}
-	}
 
-	private bool _auraVisible;
-	public void AuraVisible(bool visible)
-	{
-		if (_auraVisible == visible) return;
-		_auraVisible = visible;
-		if (_auraVisible)
+		private bool auraVisible;
+		public void AuraVisible(bool visible)
 		{
-			area.transform.DOScale(Vector3.one, 0.5f);
+			if (auraVisible == visible) return;
+			auraVisible = visible;
+			
+			area.transform.DOScale(auraVisible ? Vector3.one : Vector3.zero, 0.5f);
 		}
-		else
-		{
-			area.transform.DOScale(Vector3.zero, 0.5f);
-		}
-	}
 
-}	
+	}	
+}

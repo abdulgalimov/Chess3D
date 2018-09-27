@@ -1,4 +1,3 @@
-using System;
 
 namespace ChessGame
 {
@@ -8,12 +7,12 @@ namespace ChessGame
         {
             base.Start();
             //
-            Type = PieceType.ROOK;
+            Type = PieceType.Rook;
         }
         
         public override bool GetValidMove(Position to, Piece toPiece=null)
         {
-            return position.x == to.x || position.y == to.y;
+            return Position.X == to.X || Position.Y == to.Y;
         }
     }
 }

@@ -1,92 +1,86 @@
-﻿using ChessGame;
-using ChessGame.camera;
+﻿
 using UnityEngine;
-using Event = ChessGame.Event;
 
 
-public sealed class MainCamera : MonoBehaviour
+namespace ChessGame
 {
-    public static MainCamera instance;
-    private CMainController main = new CMainController();
-    private CGameController game = new CGameController();
-    private CKnightAttackController knightAttack = new CKnightAttackController();
+    public class MainCamera : MonoBehaviour
+    {
+        public static MainCamera Instance;
+        private readonly CMainController main = new CMainController();
+        private readonly CGameController game = new CGameController();
+        private readonly CKnightAttackController knightAttack = new CKnightAttackController();
     
-    [SerializeField]
-    private Camera camera;
+        [SerializeField]
+        private Camera cameraObject;
 
-    public void Start()
-    {
-        instance = this;
-        //
-        CameraController.Init(camera);
-        //
-        knightAttack.on(CameraControllerEvents.ON_EXIT, onExit);
-        //
-        startController(main);
-    }
-
-    private void onExit(Event e)
-    {
-        applyDefault();
-    }
-
-    private CameraController current;
-    private void startController(CameraController controller)
-    {
-        if (current != null)
+        public void Start()
         {
-            current.Stop();
+            Instance = this;
+            
+            CameraController.Init(cameraObject);
+            
+            knightAttack.On(CameraControllerEvents.OnExit, OnExit);
+            
+            StartController(main);
         }
 
-        current = controller;
-        current.Start();
-    }
-    
-    
-    private void Update()
-    {
-        if (current != null)
+        private void OnExit(Event e)
         {
-            current.Update();
+            ApplyDefault();
         }
-    }
 
-    public Camera GetCamera()
-    {
-        return camera;
-    }
-
-    public CameraController KnightAttack(Piece fromPiece, Vector3 toPoint)
-    {
-        startController(knightAttack);
-        knightAttack.Init(fromPiece, toPoint);
-        return knightAttack;
-    }
-
-
-    private bool _waitMode;
-    public bool WaitMode
-    {
-        set
+        private CameraController current;
+        private void StartController(CameraController controller)
         {
-            if (_waitMode != value)
+            current?.Stop();
+
+            current = controller;
+            current.Start();
+        }
+    
+    
+        private void Update()
+        {
+            current?.Update();
+        }
+
+        public Camera GetCamera()
+        {
+            return cameraObject;
+        }
+
+        public CameraController KnightAttack(Piece fromPiece, Vector3 toPoint)
+        {
+            StartController(knightAttack);
+            knightAttack.Init(fromPiece, toPoint);
+            return knightAttack;
+        }
+
+
+        private bool waitMode;
+        public bool WaitMode
+        {
+            set
             {
-                _waitMode = value;
-                applyDefault();
+                if (waitMode == value) return;
+                waitMode = value;
+                ApplyDefault();
             }
         }
-    }
 
-    private void applyDefault()
-    {
-        if (_waitMode)
+        private void ApplyDefault()
         {
-            startController(main);                    
+            if (waitMode)
+            {
+                StartController(main);                    
+            }
+            else
+            {
+                StartController(game);
+            }
         }
-        else
-        {
-            startController(game);
-        }
+
     }
 
 }
