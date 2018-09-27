@@ -4,14 +4,12 @@ using DG.Tweening;
 
 public class Board : MonoBehaviour
 {
+	[SerializeField]
 	private Transform area;
 	private ParticleSystem aura;
 
 	void Start ()
 	{
-		DOTween.Init(true, true);
-		//
-		area = transform.Find("selected_area");
 		area.transform.position = new Vector3(0, 13, 0);
 		aura = area.GetComponent<ParticleSystem>();
 		//
